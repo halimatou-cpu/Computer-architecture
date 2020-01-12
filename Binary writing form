@@ -1,0 +1,94 @@
+
+DEFAULT REL
+
+extern printf
+extern scanf
+
+segment .data  ; memoire globale donnees initialisees
+
+prompt1       db "Saisir un entier :",0
+formaSortie1       db "OUI",10,0
+formaSortie2       db "NON",10,0
+
+longIntFormat  db "%ld",0
+
+ 
+
+segment .bss  ; memoire globale donnees non itialisees
+
+entier  resq 1
+
+segment .text ; code du programme
+
+        global  main
+
+ 
+main:  ; fonction principale
+
+; sauvegarde des registres sur la pile
+
+     push rbp
+     push r12
+     push r13
+
+; appel printf
+
+    lea rdi,[prompt1]
+    mov rax,0
+    call printf wrt ..plt
+
+; appel scanf
+
+        lea rdi,[longIntFormat]
+        lea rsi,[entier]
+        mov rax,0
+        call scanf wrt ..plt
+
+mov rbp,[entier]
+mov r13,[entier]
+             
+if: cmp rbp,0
+    jle sinon
+    and rbp,1
+    jnz sinon
+    mov rcx,0
+    faire1:  
+    ; les zeros
+   sar r13,1
+   mov r12,r13
+   and r12,1
+   if1: 
+    cmp r12,1
+    je end1
+    inc rcx
+    jmp faire1
+   end1:
+     mov rbp,0
+     faire2:
+       sar r13,1
+       mov r12,r13
+       and r12,1
+       if2: 
+         cmp r12,1
+         jne fin2
+         inc rbp
+         jmp faire2    
+       fin2:
+         cmp rbp,rcx
+         jne sinon
+         lea rdi,[formaSortie1]
+         mov rax,0
+         call printf wrt ..plt
+         jmp endif
+sinon:
+     lea rdi,[formaSortie2]
+     mov rax,0
+     call printf wrt ..plt
+endif:
+;restauration des régistres
+  pop r13
+  pop r12
+  pop rbp
+
+mov rax,0
+ret
