@@ -1,0 +1,89 @@
+DEFAULT REL
+; fonctions externes pour les entrees/sortie
+extern printf
+extern scanf
+segment .data  ; memoire globale donnees initialisees
+prompt1       db "Entrez un entier : ",0
+prompt2       db "Entrez un deuxieme entier : ",0
+formatSortie1      db "a OR b est : %ld",10,0
+formatSortie2       db "a AND b est : %ld",10,0
+formatSortie3       db "a XOR b est : %ld",10,0
+
+
+longIntFormat  db "%ld",0
+
+segment .bss  ; memoire globale donnees non itialisees
+entier1  resq 1
+entier2  resq 1
+resultat1 resq 1
+resultat2 resq 1
+resultat3 resq 1
+
+segment .text ; code du programme
+        global  main
+main:  ; fonction appelee par le programme C
+; sauvegarde des registres sur la pile (obligatoirement un nombre impair)
+	push rbp
+	push rbx
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
+; appel printf
+	lea rdi,[prompt1]
+        mov rax,0
+	call printf wrt ..plt
+; appel scanf
+        lea rdi,[longIntFormat]
+        lea rsi,[entier1]
+        mov rax,0
+	call scanf wrt ..plt
+	mov rbx,[entier1]
+	mov r12,[entier1]
+    mov r13, [entier1]
+; appel printf
+        lea rdi,[prompt2]
+        mov rax,0
+	call printf wrt ..plt
+; appel scanf
+        lea rdi,[longIntFormat]
+        lea rsi,[entier2]
+        mov rax,0
+	call scanf wrt ..plt
+	mov rcx,[entier2]
+	mov r14,[entier2]
+	mov r15,[entier2]
+; calcul de la somme et sauvegarde du resultat en memoire
+	or rbx,rcx
+	mov [resultat1],rbx
+; appel printf
+	lea rdi,[formatSortie1]
+        mov rsi,[resultat1]
+        mov rax,0
+	call printf wrt ..plt
+	and r12,r14
+	mov [resultat2],r12
+; appel printf
+	lea rdi,[formatSortie2]
+        mov rsi,[resultat2]
+        mov rax,0
+	call printf wrt ..plt
+	xor r13,r15
+	mov [resultat3],r13
+; appel printf
+	lea rdi,[formatSortie3]
+        mov rsi,[resultat3]
+        mov rax,0
+	call printf wrt ..plt
+; restauration des registres
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+	pop r11
+	pop rbx
+	pop rbp
+; envoi de 0 au programme C
+        mov     rax, 0            
+        ret
