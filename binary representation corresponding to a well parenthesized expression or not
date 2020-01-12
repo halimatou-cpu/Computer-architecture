@@ -1,0 +1,81 @@
+DEFAULT REL
+; fonctions externes pour les entrees/sortie
+extern printf
+extern scanf
+segment .data  ; memoire globale donnees initialisees
+prompt1       db "Entrez un entier en hexadecimal: ",0
+formatSortie1      db "BIEN parenthésée",10,0
+formatSortie2       db "PAS BIEN bien parenthésée",10,0
+longIntFormat  db "%lx",0   ; x pour hexadecimal
+
+
+segment .bss  ; memoire globale donnees non itialisees
+entier  resq 1
+
+segment .text ; code du programme
+        global  main
+main:  ; fonction principale
+; sauvegarde des registres sur la pile
+  push rbp
+  push r12
+  push r13
+  push r14
+  push r15
+; appel printf
+    lea rdi,[prompt1]
+    mov rax,0
+ call printf wrt ..plt
+; appel scanf
+    lea rdi,[longIntFormat]
+    lea rsi,[entier]
+    mov rax,0
+ call scanf wrt ..plt
+mov r12,[entier]
+mov rbp,[entier]
+and rbp,1
+
+if:
+    cmp rbp,1
+    jne else
+    mov r13,r12
+    mov rcx,0
+    boucle1: cmp r13,0
+            jle endboucle1
+            inc rcx
+            sar r13,4
+            jmp boucle1
+    endboucle1:
+    lea r14,[rcx]
+    dec r14
+    mov r13,r12
+    boucle2: cmp r14,0
+      je endboucle2
+      dec r14
+      sar r13,4
+      jmp boucle2
+    endboucle2:
+  
+    if1:
+      cmp r13,15
+      jne else
+      lea rdi,[formatSortie1]
+      mov rax,0
+     call printf wrt ..plt
+      mov rbp,rbx
+    endif1:
+    jmp endif
+   
+else:
+    lea rdi,[formatSortie2]
+    mov rax,0
+call printf wrt ..plt
+endif:
+; restauration des registres
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop rbp
+; envoi de 0 au programme C
+    mov     rax, 0            
+    ret
