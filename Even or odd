@@ -1,0 +1,58 @@
+DEFAULT REL
+; fonctions externes pour les entrees/sortie
+extern printf
+extern scanf
+segment .data  ; memoire globale donnees initialisees
+prompt1       db "Saisir un entier signé n : ",0
+formatSortie1       db "pair",10,0
+formatSortie2       db "impair",10,0
+longIntFormat  db "%ld",0
+
+segment .bss  ; memoire globale donnees non itialisees
+entier1  resq 1
+entier2  resq 1
+resultat resq 1
+
+segment .text ; code du programme
+        global  main
+main:  ; fonction appelee par le programme C
+; sauvegarde des registres sur la pile
+	push rbp
+	push rbx
+	push r8
+
+; appel printf
+	lea rdi,[prompt1]
+        mov rax,0
+	call printf wrt ..plt
+; appel scanf
+        lea rdi,[longIntFormat]
+        lea rsi,[entier1]
+        mov rax,0
+	call scanf wrt ..plt
+	mov rbx,[entier1]
+; appel printf
+        mov rdx,0
+        mov rax,rbx
+        mov r8,1
+        and rbx,r8
+        cmp rbx,1
+         je if1
+ lea rdi,[formatSortie1]
+    mov rsi,rbx
+    mov rax,0
+	call printf wrt ..plt
+	jmp end
+ if1:
+   lea rdi,[formatSortie2]
+   mov rsi,rbx
+   mov rax,0
+   call printf wrt ..plt
+    jmp end
+end:
+	pop r8
+	pop rbx
+	pop rbp
+; envoi de 0 au programme C
+        mov     rax, 0            
+        ret
