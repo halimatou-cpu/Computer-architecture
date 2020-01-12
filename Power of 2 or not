@@ -1,0 +1,71 @@
+DEFAULT REL
+; fonctions externes pour les entrees/sortie
+extern printf
+extern scanf
+segment .data  ; memoire globale donnees initialisees
+prompt1 db "Saisir un entier :",0
+prompt2 db "Votre entier EST une puissance de 2",10,0
+prompt3 db "Votre entier n'est PAS une puissance 2",10,0
+longIntFormat  db "%ld",0
+
+segment .bss  ; memoire globale donnees non itialisees
+entier1  resq 1
+entier2  resq 1
+resultat resq 1
+
+segment .text ; code du programme
+        global  main
+main:  ; fonction appelee par le programme C
+; sauvegarde des registres sur la pile
+	push rbp
+	push rbx
+	push r8
+;	push r9
+;	push r10
+
+; appel printf
+	lea rdi,[prompt1]
+        mov rax,0
+	call printf wrt ..plt
+; appel scanf
+        lea rdi,[longIntFormat]
+        lea rsi,[entier1]
+        mov rax,0
+	call scanf wrt ..plt
+	mov rbx,[entier1]
+	mov rax, rbx
+	mov r8,2
+	
+if0:
+    cmp rbx, 1
+     je if1
+    mov rdx,0
+    idiv r8
+    cmp rdx, 1
+     je if2
+    cmp rax,1
+     jg if0
+     jmp if1
+if2: 
+    lea rdi, [prompt3]
+    mov rsi, rbx
+    mov rax,0
+    call printf wrt ..plt
+    jmp end
+if1: 
+    lea rdi, [prompt2]
+    mov rsi, rbx
+    mov rax, 0
+    call printf wrt ..plt
+    jmp end
+end:
+	
+; restauration des registres
+    ;pop r10
+    ;pop r9
+    pop r8
+    pop rbx
+	pop rbp
+; envoi de 0 au programme C
+        mov     rax, 0            
+        ret
